@@ -326,7 +326,7 @@ protected:
 
 };
 
-#if defined _WIN32
+#if defined WINDOWS
 #define DECLARE_MAIN(a)                             \
 sb7::application *app = 0;                          \
 int CALLBACK WinMain(HINSTANCE hInstance,           \
@@ -339,7 +339,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,           \
     delete app;                                     \
     return 0;                                       \
 }
-#elif defined _LINUX || defined __APPLE__
+#elif defined LINUX
 #define DECLARE_MAIN(a)                             \
 int main(int argc, const char ** argv)              \
 {                                                   \

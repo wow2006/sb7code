@@ -21,3 +21,12 @@ target_link_libraries(
   gl3w::gl3w
   GLFW::glfw3
 )
+
+target_compile_definitions(
+  sb7
+  PUBLIC
+  $<$<PLATFORM_ID:Linux>:LINUX>
+  $<$<PLATFORM_ID:Darwin>:LINUX>
+  $<$<PLATFORM_ID:Windows>:WINDOWS>
+)
+

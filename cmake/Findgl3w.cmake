@@ -30,8 +30,6 @@ target_include_directories(
   ${GL3W_DIR}/include/
 )
 
-message("  ${GL3W_DIR}/include/")
-
 target_link_libraries(
   gl3w
   PRIVATE
