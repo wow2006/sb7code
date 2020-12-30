@@ -1,5 +1,5 @@
 # ${CMAKE_SOURCE_DIR}/CMakeLists.txt
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.16)
 project(superbible7)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -18,7 +18,9 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
     set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/lib )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
+find_package(gl3w   REQUIRED)
 find_package(GLFW   REQUIRED)
+set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
 
 set (CMAKE_DEBUG_POSTFIX "_d")
@@ -41,12 +43,12 @@ add_library(
   src/sb7/sb7object.cpp
   src/sb7/sb7shader.cpp
   src/sb7/sb7textoverlay.cpp
-  src/sb7/gl3w.c
 )
 
 target_link_libraries(
   sb7
-  PRIVATE
+  PUBLIC
+  gl3w::gl3w
   GLFW::glfw3
 )
 
@@ -162,3 +164,4 @@ include_directories(extern/glfw-3.0.4/include)
 
 ADD_CUSTOM_TARGET(debug ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=Debug ${PROJECT_SOURCE_DIR})
 ADD_CUSTOM_TARGET(release ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=Release ${PROJECT_SOURCE_DIR})
+
