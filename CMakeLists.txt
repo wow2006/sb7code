@@ -1,6 +1,8 @@
+# ${CMAKE_SOURCE_DIR}/CMakeLists.txt
 cmake_minimum_required (VERSION 2.6)
+project(superbible7)
 
-project (superbible7)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/lib )
 
@@ -16,30 +18,36 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
     set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/lib )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
-find_package(OpenGL)
+find_package(GLFW   REQUIRED)
+find_package(OpenGL REQUIRED)
 
 set (CMAKE_DEBUG_POSTFIX "_d")
 
 if(WIN32)
-set(COMMON_LIBS sb7 optimized glfw3 debug glfw3_d ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES})
+set(COMMON_LIBS sb7 ${OPENGL_LIBRARIES})
 elseif (UNIX)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLFW REQUIRED glfw3)
-set(COMMON_LIBS sb7 glfw3 X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL rt dl)
+set(COMMON_LIBS sb7 X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL rt dl)
 else()
 set(COMMON_LIBS sb7)
 endif()
 
 set(COMMON_LIBS ${COMMON_LIBS} ${EXTRA_LIBS})
 
-add_library(sb7
-            src/sb7/sb7.cpp
-            src/sb7/sb7color.cpp
-            src/sb7/sb7ktx.cpp
-            src/sb7/sb7object.cpp
-            src/sb7/sb7shader.cpp
-            src/sb7/sb7textoverlay.cpp
-            src/sb7/gl3w.c
+add_library(
+  sb7
+  src/sb7/sb7.cpp
+  src/sb7/sb7color.cpp
+  src/sb7/sb7ktx.cpp
+  src/sb7/sb7object.cpp
+  src/sb7/sb7shader.cpp
+  src/sb7/sb7textoverlay.cpp
+  src/sb7/gl3w.c
+)
+
+target_link_libraries(
+  sb7
+  PRIVATE
+  GLFW::glfw3
 )
 
 set(RUN_DIR ${PROJECT_SOURCE_DIR}/bin)
