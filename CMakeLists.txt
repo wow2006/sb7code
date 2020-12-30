@@ -4,57 +4,15 @@ project(superbible7)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/lib )
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-
-# Second, for multi-config builds (e.g. msvc)
-foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
-    string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/bin )
-    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/lib )
-    set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/lib )
-endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
-
-find_package(gl3w   REQUIRED)
-find_package(GLFW   REQUIRED)
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
+find_package(gl3w   REQUIRED)
+find_package(GLFW   REQUIRED)
 
-set (CMAKE_DEBUG_POSTFIX "_d")
+add_subdirectory(library)
 
-if(WIN32)
-set(COMMON_LIBS sb7 ${OPENGL_LIBRARIES})
-elseif (UNIX)
-set(COMMON_LIBS sb7 X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL rt dl)
-else()
-set(COMMON_LIBS sb7)
-endif()
-
-set(COMMON_LIBS ${COMMON_LIBS} ${EXTRA_LIBS})
-
-add_library(
-  sb7
-  src/sb7/sb7.cpp
-  src/sb7/sb7color.cpp
-  src/sb7/sb7ktx.cpp
-  src/sb7/sb7object.cpp
-  src/sb7/sb7shader.cpp
-  src/sb7/sb7textoverlay.cpp
-)
-
-target_link_libraries(
-  sb7
-  PUBLIC
-  gl3w::gl3w
-  GLFW::glfw3
-)
-
-set(RUN_DIR ${PROJECT_SOURCE_DIR}/bin)
-
-set(EXAMPLES
+set(
+  EXAMPLES
   alienrain
   basicfbo
   bindlesstex
@@ -149,7 +107,11 @@ endif()
 foreach(EXAMPLE ${EXAMPLES})
   add_executable(${EXAMPLE} WIN32 src/${EXAMPLE}/${EXAMPLE}.cpp)
   set_property(TARGET ${EXAMPLE} PROPERTY DEBUG_POSTFIX _d)
-  target_link_libraries(${EXAMPLE} ${COMMON_LIBS})
+  target_link_libraries(
+    ${EXAMPLE}
+    PUBLIC
+    sb7
+  )
   if(MSVC)
     configure_file(${PROJECT_SOURCE_DIR}/build/templates/vs2013.vcxproj.user.in ${CMAKE_CURRENT_BINARY_DIR}/${EXAMPLE}.vcxproj.user @ONLY)
   endif(MSVC)
@@ -160,7 +122,6 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 include_directories( include )
-include_directories(extern/glfw-3.0.4/include)
 
 ADD_CUSTOM_TARGET(debug ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=Debug ${PROJECT_SOURCE_DIR})
 ADD_CUSTOM_TARGET(release ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=Release ${PROJECT_SOURCE_DIR})
